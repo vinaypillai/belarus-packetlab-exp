@@ -16,6 +16,7 @@ async def http_query(url):
             response = await client.get(url)
             data['status'] = response.status_code;
             data['content'] = response.content.decode('utf-8');
+            await response.aclose()
         except UnicodeDecodeError as err:
             data['content'] = response.content.decode('ISO-8859-1');
         except httpx.RequestError as err:
@@ -23,7 +24,7 @@ async def http_query(url):
             print(err)
             data['error'] = str(err)
         except:
-            print("UNCAUGHT HTTP ERROR",exc_info()[0])
+            print("UNCAUGHT HTTP ERROR",exc_info())
     return data
 
 async def dns_query(hostname):
@@ -39,7 +40,7 @@ async def dns_query(hostname):
         print(hostname)
         data['error'] = err.msg
     except:
-        print("UNCAUGHT DNS ERROR",exc_info()[0])
+        print("UNCAUGHT DNS ERROR",exc_info())
     return data
 
 async def main():
@@ -77,6 +78,7 @@ async def main():
             http_responses = await asyncio.gather(*http_tasks)
             dns_responses = await asyncio.gather(*dns_tasks)
         except asyncio.exceptions.InvalidStateError as err:
+            print("STATE ERROR")
             print(err)
 
         for i, site in enumerate(sites):
@@ -92,4 +94,5 @@ async def main():
     print(f"DURATION:{finish_timestamp - timestamp}", file=stderr)
     print("---", file=stderr)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

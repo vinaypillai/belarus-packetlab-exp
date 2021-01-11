@@ -72,3 +72,7 @@ http://zenmate.com
 http://tlgrm.mnja
 http://tutanota.com
 http://telegramproxy.online
+http://nn.by
+http://tut.by
+http://telegram.org
+http://core.telegram.org

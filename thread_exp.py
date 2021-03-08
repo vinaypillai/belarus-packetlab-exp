@@ -61,11 +61,10 @@ def main():
     print("TIME: {}".format(timestamp), file=stderr)
     print("---", file=stderr)
     outfile_name = "results-{}.jsonl".format(timestamp)
-    # outfile_name = "results.jsonl"
-    # file_count = 0
-    # while os.path.exists(outfile_name):
-    #     file_count += 1
-    #     outfile_name = f"results-{timestamp}_{file_count}.jsonl"
+    file_count = 0
+    while os.path.exists(outfile_name):
+        file_count += 1
+        outfile_name = f"results-{timestamp}_{file_count}.jsonl"
 
     http_sites = []
     dns_hostnames = []

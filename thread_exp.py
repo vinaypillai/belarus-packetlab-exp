@@ -68,7 +68,7 @@ def main():
 
     http_sites = []
     dns_hostnames = []
-    with open("blocked-test2.txt") as infile:
+    with open("blocked-test3.txt") as infile:
         for row in infile:
             site = row.strip()
             http_sites.append(site)

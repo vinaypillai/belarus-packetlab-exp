@@ -14,7 +14,7 @@ import requests
 def http_query(url):
     data = {}
     try:
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=2)
         data["status"] = resp.status_code
         data["content"] = resp.text[:100] if len(resp.text) > 100 else resp.text
     except requests.exceptions.RequestException as err:

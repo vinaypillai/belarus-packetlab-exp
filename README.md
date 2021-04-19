@@ -24,4 +24,5 @@ Outputs a  JSONL file, where each row is in the format
 
 #### Arguments
  `blocked_url_file`:  Path to a file of newline separated urls to test
+ 
  `results_outfile` (optional): Path for which to write experiment data. Defaults to a timestamped JSONL file

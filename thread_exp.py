@@ -2,7 +2,7 @@ import json
 import dns
 import tldextract
 import os
-from sys import stderr, exc_info
+from sys import stderr, exc_info, argv
 import time
 import traceback
 import sys
@@ -10,9 +10,22 @@ from multiprocessing.dummy import Pool
 from dns import resolver, exception
 import requests
 
+''' Send a http request for the given url 
 
-def http_query(url):
-    data = {}
+    Args:
+        url: The url to request
+
+    Returns:
+        A dictionary containing the status and response content of the
+        request, as well as any errors
+
+'''
+def http_query(url:str) -> dict:
+    data = {
+        'status':None,
+        'content':None,
+        'error':None,
+    }
     try:
         resp = requests.get(url)
         data["status"] = resp.status_code
@@ -23,24 +36,27 @@ def http_query(url):
         data["error"] = str(err)
         print(exc_info())
         traceback.print_exc(file=sys.stdout)
-    # try:
-    #     resp = httpx.get(url)
-    #     data["status"] = resp.status_code
-    #     data["content"] = resp.content.decode(resp.encoding)
-    # except httpx.RequestError as err:
-    #     print("HTTP exception request error: ", err)
-    #     print("url: ", str(url))
-    #     data["error"] = str(err)
-    #     print(exc_info())
-    #     traceback.print_exc(file=sys.stdout)
     except:
         print("UNCAUGHT HTTP ERROR", exc_info())
     return data
 
+''' Send a dns query to resolve the ip for the given hostname
 
-def dns_query(hostname):
+    Args:
+        hostname: The hostname for which to query
+
+    Returns:
+        A dictionary containing the rcode and response content of the
+        query, as well as any errors
+
+'''
+def dns_query(hostname:str) -> dict:
     dns_resolver = dns.resolver.Resolver()
-    data = {}
+    data = {
+        'rcode':None,
+        'content':None,
+        'error':None,
+    }
     try:
         resp = dns_resolver.resolve(hostname, "A").response
         data["rcode"] = resp.rcode()
@@ -53,14 +69,16 @@ def dns_query(hostname):
         print("UNCAUGHT DNS ERROR", exc_info())
     return data
 
-
-def main():
+''' Runs the blocked url experiment
+'''
+def main(blocked_url_file:str, outfile_name:str=None):
     timestamp = int(time.time())
     print("---", file=stderr)
     print("Starting experiment...", file=stderr)
     print("TIME: {}".format(timestamp), file=stderr)
     print("---", file=stderr)
-    outfile_name = "results-{}.jsonl".format(timestamp)
+    if outfile_name is None:
+        outfile_name = "results-{}.jsonl".format(timestamp)
     file_count = 0
     while os.path.exists(outfile_name):
         file_count += 1
@@ -68,7 +86,7 @@ def main():
 
     http_sites = []
     dns_hostnames = []
-    with open("blocked-test3.txt") as infile:
+    with open(blocked_url_file) as infile:
         for row in infile:
             site = row.strip()
             http_sites.append(site)
@@ -101,6 +119,18 @@ def main():
     print("DURATION:{}".format(finish_timestamp - timestamp), file=stderr)
     print("---", file=stderr)
 
+def print_usage():
+    script_name = argv[0]
+    tab = "    "
+    print("Belarus Exp\n")
+    print("Usage:")
+    print(f"{tab}{script_name} <blocked_url_file> [<results_outfile>]")
 
 if __name__ == "__main__":
-    main()
+    if len(argv) == 3:
+        main(argv[1], argv[2])
+    elif len(argv) == 2:
+        main(argv[1])
+    else:
+        print_usage()
+        
